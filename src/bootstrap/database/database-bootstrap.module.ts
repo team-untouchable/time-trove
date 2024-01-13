@@ -16,7 +16,7 @@ import { User } from '@src/users';
         password: config.password,
         database: config.database,
         ssl: true,
-        entities: [],
+        entities: [`${__dirname}/../../**/*.entity.{js,ts}`],
         synchronize: true,
       }),
     }),
