@@ -12,4 +12,4 @@ import { databaseConfiguration } from './database-configuration';
   providers: [ConfigService, DatabaseConfigService],
   exports: [ConfigService, DatabaseConfigService],
 })
-export class databaseConfigModule {}
+export class DatabaseConfigModule {}
