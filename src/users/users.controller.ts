@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from '@src/common/decorators';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User } from './entities';
@@ -20,24 +20,28 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Post()
+  @ApiExtraModels(User)
   @CustomApiResponse(User, ApiCreatedResponse)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
+  @ApiExtraModels(User)
   @CustomApiResponse([User])
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @ApiExtraModels(User)
   @CustomApiResponse(User)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Put(':id')
+  @ApiExtraModels(User)
   @CustomApiResponse(User)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
