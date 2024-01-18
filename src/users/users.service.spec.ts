@@ -86,7 +86,7 @@ describe('UsersService', () => {
 
       mockUsersRepository.findOneBy.mockResolvedValue(expectedUser);
 
-      const result = await service.findOne(userId);
+      const result = await service.findOneById(userId);
 
       expect(mockUsersRepository.findOneBy).toHaveBeenCalledWith({
         id: userId,
@@ -98,7 +98,7 @@ describe('UsersService', () => {
       const userId = 'non-existing-user-id';
       mockUsersRepository.findOneBy.mockResolvedValue(null);
 
-      const result = await service.findOne(userId);
+      const result = await service.findOneById(userId);
 
       expect(mockUsersRepository.findOneBy).toHaveBeenCalledWith({
         id: userId,

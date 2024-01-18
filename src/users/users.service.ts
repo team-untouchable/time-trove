@@ -25,21 +25,28 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: string): Promise<User | null> {
+  findOneById(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
+  }
+
+  findOneWithPassword(email: string) {
+    return this.usersRepository.findOne({
+      where: { email },
+      select: { id: true, email: true, password: true, username: true },
+    });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     updateUserDto.password = await this.encryptPassword(updateUserDto.password);
     await this.usersRepository.update(id, updateUserDto);
-    return this.findOne(id);
+    return this.findOneById(id);
   }
 
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }
 
-  encryptPassword(password: string) {
+  private encryptPassword(password: string) {
     return bcrypt.hash(password, this.authConfigService.bcrypt_salt_rounds);
   }
 }
