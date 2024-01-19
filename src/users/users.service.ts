@@ -29,6 +29,10 @@ export class UsersService {
     return this.usersRepository.findOneBy({ id });
   }
 
+  findOneByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ email });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     updateUserDto.password = await this.encryptPassword(updateUserDto.password);
     await this.usersRepository.update(id, updateUserDto);

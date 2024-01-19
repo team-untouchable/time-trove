@@ -78,6 +78,28 @@ export class AuthService {
     };
   }
 
+  async userToToken(user: User) {
+    const accessPayload: JwtAccessPayload = {
+      uid: user.id,
+      email: user.email,
+      username: user.username,
+    };
+    const jwtRefreshPayload: JwtRefreshPayload = { uid: user.id };
+
+    const accessToken = this.jwtService.sign(accessPayload);
+    const refreshToken = this.jwtService.sign(jwtRefreshPayload, {
+      secret: this.authConfigService.jwt_refresh_secret,
+      expiresIn: this.authConfigService.jwt_refresh_expiration_time,
+    });
+
+    await this.updateSession(user.id, refreshToken);
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
   private findSession(id: string): Promise<Pick<User, 'session'>> {
     return this.usersRepository.findOne({
       where: { id },
