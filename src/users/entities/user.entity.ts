@@ -1,8 +1,8 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -25,4 +25,7 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column({ select: false, nullable: true })
+  session: string;
 }

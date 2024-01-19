@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { AuthConfigService } from '@src/config';
-import type { CreateUserDto, UpdateUserDto } from './dto';
+import type { CreateUserDto, UpdateUserDto, UpdateUserSessionDto } from './dto';
 import { User } from './entities';
 
 @Injectable()
@@ -34,6 +34,18 @@ export class UsersService {
       where: { email },
       select: { id: true, email: true, password: true, username: true },
     });
+  }
+
+  findOneByIdWithSession(id: string) {
+    return this.usersRepository.findOne({
+      where: { id },
+      select: { session: true },
+    });
+  }
+
+  async updateSession(updateUserSessionDto: UpdateUserSessionDto) {
+    const { id, token } = updateUserSessionDto;
+    await this.usersRepository.update(id, { session: token });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
