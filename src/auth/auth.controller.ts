@@ -20,7 +20,7 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(JwtRefreshAuthGuard)
-  refresh(@Request() req) {
-    return req.user;
+  regenerateRefreshToken(@Request() req) {
+    return this.authService.regenerateRefreshToken(req.user);
   }
 }

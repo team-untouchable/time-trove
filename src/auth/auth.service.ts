@@ -22,24 +22,52 @@ export class AuthService {
     return user;
   }
 
-  async login(user: JwtAccessPayload) {
-    const accessPayload: JwtAccessPayload = {
-      uid: user.uid,
-      email: user.email,
-      username: user.username,
-    };
+  async login(jwtAccessPayload: JwtAccessPayload) {
     const refreshPayload: JwtRefreshPayload = {
-      uid: user.uid,
+      uid: jwtAccessPayload.uid,
     };
 
-    const accessToken = this.jwtService.sign(accessPayload);
+    const accessToken = this.jwtService.sign(jwtAccessPayload);
     const refreshToken = this.jwtService.sign(refreshPayload, {
       secret: this.authConfigService.jwt_refresh_secret,
       expiresIn: this.authConfigService.jwt_refresh_expiration_time,
     });
 
     await this.usersService.updateSession({
-      id: user.uid,
+      id: jwtAccessPayload.uid,
+      token: refreshToken,
+    });
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async validateRefreshToken({ uid }: JwtRefreshPayload, token) {
+    const user = await this.usersService.findOneByIdWithSession(uid);
+    if (!user || user.session !== token) {
+      return false;
+    }
+    return true;
+  }
+
+  async regenerateRefreshToken(jwtRefreshPayload: JwtRefreshPayload) {
+    const user = await this.usersService.findOneById(jwtRefreshPayload.uid);
+    const accessPayload: JwtAccessPayload = {
+      uid: user.id,
+      email: user.email,
+      username: user.username,
+    };
+
+    const accessToken = this.jwtService.sign(accessPayload);
+    const refreshToken = this.jwtService.sign(jwtRefreshPayload, {
+      secret: this.authConfigService.jwt_refresh_secret,
+      expiresIn: this.authConfigService.jwt_refresh_expiration_time,
+    });
+
+    await this.usersService.updateSession({
+      id: jwtRefreshPayload.uid,
       token: refreshToken,
     });
 
