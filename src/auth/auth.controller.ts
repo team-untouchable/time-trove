@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Post,
@@ -56,5 +57,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async logout(@Request() req: RequestWithPayload<JwtAccessPayload>) {
     await this.authService.logout(req.user);
+  }
+
+  @Delete('unregister')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async unregister(@Request() req: RequestWithPayload<JwtAccessPayload>) {
+    await this.usersService.remove(req.user.uid);
   }
 }
