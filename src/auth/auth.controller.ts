@@ -11,7 +11,9 @@ import {
 import { UsersService } from '@src/users';
 import { CreateUserDto } from '@src/users/dto';
 import { AuthService } from './auth.service';
-import { JwtRefreshAuthGuard, LocalAuthGuard } from './guards';
+import { JwtAuthGuard, JwtRefreshAuthGuard, LocalAuthGuard } from './guards';
+import type { JwtAccessPayload, JwtRefreshPayload } from './types';
+import { RequestWithPayload } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -36,14 +38,23 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  login(@Request() req) {
+  login(@Request() req: RequestWithPayload<JwtAccessPayload>) {
     return this.authService.login(req.user);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtRefreshAuthGuard)
-  regenerateRefreshToken(@Request() req) {
+  regenerateRefreshToken(
+    @Request() req: RequestWithPayload<JwtRefreshPayload>,
+  ) {
     return this.authService.regenerateRefreshToken(req.user);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.RESET_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async logout(@Request() req: RequestWithPayload<JwtAccessPayload>) {
+    await this.authService.logout(req.user);
   }
 }

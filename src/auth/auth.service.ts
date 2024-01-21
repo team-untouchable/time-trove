@@ -58,18 +58,8 @@ export class AuthService {
 
   async regenerateRefreshToken(jwtRefreshPayload: JwtRefreshPayload) {
     const user = await this.findAccessPayloadData(jwtRefreshPayload.uid);
-    const accessPayload: JwtAccessPayload = {
-      uid: user.id,
-      email: user.email,
-      username: user.username,
-    };
-
-    const accessToken = this.jwtService.sign(accessPayload);
-    const refreshToken = this.jwtService.sign(jwtRefreshPayload, {
-      secret: this.authConfigService.jwt_refresh_secret,
-      expiresIn: this.authConfigService.jwt_refresh_expiration_time,
-    });
-
+    const { access_token: accessToken, refresh_token: refreshToken } =
+      await this.userToToken(user);
     await this.updateSession(user.id, refreshToken);
 
     return {
@@ -100,6 +90,10 @@ export class AuthService {
     };
   }
 
+  async logout({ uid }: JwtAccessPayload) {
+    await this.deleteSession(uid);
+  }
+
   private findSession(id: string): Promise<Pick<User, 'session'>> {
     return this.usersRepository.findOne({
       where: { id },
@@ -109,6 +103,10 @@ export class AuthService {
 
   private async updateSession(id: string, token: string) {
     await this.usersRepository.update(id, { session: token });
+  }
+
+  private async deleteSession(id) {
+    await this.usersRepository.update(id, { session: null });
   }
 
   private findAccessPayloadData(id: string) {
