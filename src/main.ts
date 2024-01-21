@@ -17,8 +17,16 @@ async function bootstrap() {
     .setTitle(`${appConfig.name} example`)
     .setDescription(`${appConfig.name}에서 사용할 수 있는 api에 대한 문서`)
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        name: 'JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
-  // const swaggerDocumentOption: SwaggerDocumentOptions = {extraModels: []};
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 

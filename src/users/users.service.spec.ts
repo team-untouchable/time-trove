@@ -1,6 +1,7 @@
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { AuthConfigService } from '@src/config';
 import type { Repository } from 'typeorm';
 import type { UpdateUserDto } from './dto';
 import { User } from './entities';
@@ -21,14 +22,23 @@ describe('UsersService', () => {
   let service: UsersService;
   let mockUsersRepository: MockRepository<User>;
   let userDto;
+  let mockAuthConfigService: Partial<AuthConfigService>;
 
   beforeEach(async () => {
+    mockAuthConfigService = {
+      bcrypt_salt_rounds: 10,
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         {
           provide: getRepositoryToken(User),
           useFactory: repositoryMockFactory,
+        },
+        {
+          provide: AuthConfigService,
+          useValue: mockAuthConfigService,
         },
       ],
     }).compile();
@@ -86,7 +96,7 @@ describe('UsersService', () => {
 
       mockUsersRepository.findOneBy.mockResolvedValue(expectedUser);
 
-      const result = await service.findOne(userId);
+      const result = await service.findOneById(userId);
 
       expect(mockUsersRepository.findOneBy).toHaveBeenCalledWith({
         id: userId,
@@ -98,7 +108,7 @@ describe('UsersService', () => {
       const userId = 'non-existing-user-id';
       mockUsersRepository.findOneBy.mockResolvedValue(null);
 
-      const result = await service.findOne(userId);
+      const result = await service.findOneById(userId);
 
       expect(mockUsersRepository.findOneBy).toHaveBeenCalledWith({
         id: userId,
