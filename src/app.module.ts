@@ -6,7 +6,7 @@ import { BootstrapModule } from './bootstrap';
 import { UsersModule } from './users';
 
 @Module({
-  imports: [BootstrapModule, UsersModule, AuthModule],
+  imports: [BootstrapModule, AuthModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })

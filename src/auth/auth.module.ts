@@ -1,16 +1,19 @@
-import { Module } from '@nestjs/common';
+/* eslint-disable import/no-cycle */
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthConfigModule, AuthConfigService } from '@src/config';
-import { User, UsersModule, UsersService } from '@src/users';
+import { User, UsersModule } from '@src/users';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard, JwtRefreshAuthGuard } from './guards';
 import { JwtRefreshStrategy, LocalStrategy } from './strategies';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
+    forwardRef(() => UsersModule),
     PassportModule,
     JwtModule.registerAsync({
       imports: [AuthConfigModule],
@@ -24,16 +27,16 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
     TypeOrmModule.forFeature([User]),
     AuthConfigModule,
-    UsersModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    AuthConfigService,
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
-    UsersService,
+    JwtAuthGuard,
+    JwtRefreshAuthGuard,
   ],
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}

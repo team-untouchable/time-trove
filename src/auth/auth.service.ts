@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';

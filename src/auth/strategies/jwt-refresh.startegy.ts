@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+/* eslint-disable import/no-cycle */
+import {
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthConfigService } from '@src/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import type { JwtRefreshPayload, RequestWithRefreshToken } from '../types';
 import { AuthService } from '../auth.service';
+import type { JwtRefreshPayload, RequestWithRefreshToken } from '../types';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -12,7 +18,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 ) {
   constructor(
     authConfigService: AuthConfigService,
-    private authService: AuthService,
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refresh_token'),
