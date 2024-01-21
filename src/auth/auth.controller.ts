@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import {
   Body,
   ConflictException,
@@ -5,25 +6,39 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   Request,
   UseGuards,
+  forwardRef,
 } from '@nestjs/common';
-import { UsersService } from '@src/users';
-import { CreateUserDto } from '@src/users/dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiExtraModels,
+  ApiNoContentResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CustomApiResponse } from '@src/common';
+import { CreateUserDto, UsersService } from '@src/users';
 import { AuthService } from './auth.service';
+import { AuthResponseDto, LoginDto } from './dto';
 import { JwtAuthGuard, JwtRefreshAuthGuard, LocalAuthGuard } from './guards';
 import type { JwtAccessPayload, JwtRefreshPayload } from './types';
 import { RequestWithPayload } from './types';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private usersService: UsersService,
+    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
   ) {}
 
   @Post('register')
+  @ApiExtraModels(AuthResponseDto)
+  @CustomApiResponse(AuthResponseDto, ApiCreatedResponse)
   async register(@Body() createUserDto: CreateUserDto) {
     const duplicateEamil = await this.usersService.findOneByEmail(
       createUserDto.email,
@@ -39,13 +54,21 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  login(@Request() req: RequestWithPayload<JwtAccessPayload>) {
+  @ApiExtraModels(AuthResponseDto)
+  @CustomApiResponse(AuthResponseDto)
+  login(
+    @Request() req: RequestWithPayload<JwtAccessPayload>,
+    @Body() _: LoginDto,
+  ) {
     return this.authService.login(req.user);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtRefreshAuthGuard)
+  @ApiBody({ schema: { properties: { refresh_token: { type: 'string' } } } })
+  @ApiExtraModels(AuthResponseDto)
+  @CustomApiResponse(AuthResponseDto, ApiCreatedResponse)
   regenerateRefreshToken(
     @Request() req: RequestWithPayload<JwtRefreshPayload>,
   ) {
@@ -53,8 +76,10 @@ export class AuthController {
   }
 
   @Post('logout')
-  @HttpCode(HttpStatus.RESET_CONTENT)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiNoContentResponse()
   async logout(@Request() req: RequestWithPayload<JwtAccessPayload>) {
     await this.authService.logout(req.user);
   }
@@ -62,6 +87,8 @@ export class AuthController {
   @Delete('unregister')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiNoContentResponse()
   async unregister(@Request() req: RequestWithPayload<JwtAccessPayload>) {
     await this.usersService.remove(req.user.uid);
   }
