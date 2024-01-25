@@ -1,24 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthConfigService } from '@src/config';
-import { Repository } from 'typeorm';
-import { UpdateUserDto, User } from '@src/users';
+import { Equal, Repository } from 'typeorm';
 import type { CreateEventDto } from './dto/create-event.dto';
-import { Event } from './entities';
 import type { UpdateEventDto } from './dto/update-event.dto';
+import { Event } from './entities';
 
 @Injectable()
-export class EventService {
+export class EventsService {
   constructor(
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
     private authConfigService: AuthConfigService,
   ) {}
 
-  async create(createEventDto: CreateEventDto): Promise<Event> {
-    const event: Event = this.eventsRepository.create(createEventDto);
-    await this.eventsRepository.insert(event);
-    return event;
+  async create(createEventDto: CreateEventDto): Promise<void> {
+    // // const event: Event = this.eventsRepository.create(createEventDto);
+    // await this.eventsRepository.insert(event);
+    // return event;
   }
 
   findAll(): Promise<Event[]> {
@@ -32,7 +31,7 @@ export class EventService {
   findOneByUserId(userid: string): Promise<Event[] | null> {
     return this.eventsRepository.find({
       where: {
-        user_id: userid,
+        user_id: Equal(userid),
       },
     });
   }
@@ -40,7 +39,7 @@ export class EventService {
   findOneByTitle(userid: string, title: string): Promise<Event | null> {
     return this.eventsRepository.findOne({
       where: {
-        user_id: userid,
+        user_id: Equal(userid),
         title,
       },
     });
@@ -49,7 +48,7 @@ export class EventService {
   findOneByStartedAt(userid: string, startedat: Date): Promise<Event | null> {
     return this.eventsRepository.findOne({
       where: {
-        user_id: userid,
+        user_id: Equal(userid),
         started_at: startedat,
       },
     });

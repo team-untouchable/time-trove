@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseConfigModule, DatabaseConfigService } from '@src/config';
-import { User } from '@src/users';
 
 @Module({
   imports: [
