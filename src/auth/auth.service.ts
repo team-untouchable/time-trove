@@ -1,9 +1,11 @@
 /* eslint-disable import/no-cycle */
 import { Injectable } from '@nestjs/common';
+// eslint-disable-next-line import/no-unresolved
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthConfigService } from '@src/config';
 import { User } from '@src/users';
+// eslint-disable-next-line import/no-unresolved
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import type { LoginDto } from './dto';

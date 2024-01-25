@@ -2,9 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+// eslint-disable-next-line import/no-cycle
+import { Event } from '@src/event/entities';
 
 @Entity()
 export class User {
@@ -28,4 +32,7 @@ export class User {
 
   @Column({ select: false, nullable: true })
   session: string;
+
+  @OneToMany((type) => Event, (event) => event.user)
+  events: Event[];
 }
