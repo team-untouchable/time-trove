@@ -4,6 +4,7 @@ import { AuthConfigService } from '@src/config';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import type { CreateUserDto, UpdateUserDto } from './dto';
+// eslint-disable-next-line import/no-cycle
 import { User } from './entities';
 
 @Injectable()
