@@ -1,18 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  Param,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@src/auth/guards';
 import { CustomApiResponse } from '@src/common/decorators';
 import { UpdateUserDto } from './dto';
-// eslint-disable-next-line import/no-cycle
 import { User } from './entities';
 import { UsersService } from './users.service';
 

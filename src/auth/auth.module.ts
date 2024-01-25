@@ -1,10 +1,11 @@
 /* eslint-disable import/no-cycle */
-import { Global, Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthConfigModule, AuthConfigService } from '@src/config';
-import { User, UsersModule } from '@src/users';
+import { UsersModule } from '@src/users';
+import { User } from '@src/users/entities';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, JwtRefreshAuthGuard } from './guards';

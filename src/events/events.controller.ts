@@ -1,46 +1,43 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@src/auth/guards';
 import { CustomApiResponse } from '@src/common/decorators/custom-api-response.decorator';
-import { get } from 'http';
-import { UpdateUserDto } from '@src/users';
-import { AuthGuard } from '@nestjs/passport';
-import { EventService } from './events.service';
 import { CreateEventDto } from './dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { Event } from './entities';
+import { EventsService } from './events.service';
 
 @ApiTags('events')
 @Controller('events')
-export class EventController {
-  constructor(private eventService: EventService) {}
+export class EventsController {
+  constructor(private eventService: EventsService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
-  @CustomApiResponse(Event)
+  @CustomApiResponse(Event, ApiCreatedResponse)
   create(@Body() createEventDto: CreateEventDto) {
     return this.eventService.create(createEventDto);
   }
 
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
-  // eslint-disable-next-line no-undef
   @CustomApiResponse([Event])
   findAll() {
     return this.eventService.findAll();
   }
 
   @Get(':userid')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
   @CustomApiResponse([Event])
   findAllByUserId(@Param('userid') userid: string) {
@@ -48,7 +45,7 @@ export class EventController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
   @CustomApiResponse(Event)
   findById(@Param('id') id: string) {
@@ -56,7 +53,7 @@ export class EventController {
   }
 
   @Get('/:id/:title')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
   @CustomApiResponse(Event)
   findByTitle(@Param('id') userid: string, @Param('title') title: string) {
@@ -64,7 +61,7 @@ export class EventController {
   }
 
   @Get('/:id/:startedat')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
   @CustomApiResponse(Event)
   findByStartedAt(
@@ -75,7 +72,7 @@ export class EventController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiExtraModels(Event)
   @CustomApiResponse(Event)
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
