@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthConfigService } from '@src/config';
 import { Equal, Repository } from 'typeorm';
+import type { JwtAccessPayload } from '@src/auth';
+import { UsersService } from '@src/users';
 import type { CreateEventDto } from './dto/create-event.dto';
 import type { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities';
@@ -11,17 +12,25 @@ export class EventsService {
   constructor(
     @InjectRepository(Event)
     private eventsRepository: Repository<Event>,
-    private authConfigService: AuthConfigService,
+    private usersService: UsersService,
   ) {}
 
-  async create(createEventDto: CreateEventDto): Promise<void> {
-    // // const event: Event = this.eventsRepository.create(createEventDto);
-    // await this.eventsRepository.insert(event);
-    // return event;
+  async create(userid: string, createeventDto: CreateEventDto): Promise<Event> {
+    const user = await this.usersService.findOneByEmail(userid);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const event = this.eventsRepository.create(createeventDto);
+    event.user_id = user;
+    return this.eventsRepository.save(event);
   }
 
-  findAll(): Promise<Event[]> {
-    return this.eventsRepository.find();
+  findAll(userid: string): Promise<Event[]> {
+    return this.eventsRepository.find({
+      where: {
+        user_id: Equal(userid),
+      },
+    });
   }
 
   findOneById(id: string): Promise<Event | null> {
@@ -32,24 +41,6 @@ export class EventsService {
     return this.eventsRepository.find({
       where: {
         user_id: Equal(userid),
-      },
-    });
-  }
-
-  findOneByTitle(userid: string, title: string): Promise<Event | null> {
-    return this.eventsRepository.findOne({
-      where: {
-        user_id: Equal(userid),
-        title,
-      },
-    });
-  }
-
-  findOneByStartedAt(userid: string, startedat: Date): Promise<Event | null> {
-    return this.eventsRepository.findOne({
-      where: {
-        user_id: Equal(userid),
-        started_at: startedat,
       },
     });
   }

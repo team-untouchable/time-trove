@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@src/auth/guards';
 import { CustomApiResponse } from '@src/common/decorators';
 import { UpdateUserDto } from './dto';
@@ -27,6 +27,7 @@ export class UsersController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
   @ApiExtraModels(User)
   @CustomApiResponse(User)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
