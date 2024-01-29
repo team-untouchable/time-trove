@@ -36,8 +36,6 @@ export class EventsController {
     @Req() req: RequestWithPayload,
     @Body() createEventDto: CreateEventDto,
   ) {
-    console.log(req.user);
-    console.log(createEventDto);
     return this.eventService.create(req.user.email, createEventDto);
   }
 
@@ -50,15 +48,6 @@ export class EventsController {
     return this.eventService.findAll(req.user.uid);
   }
 
-  /*
-  @Get(':userid')
-  @UseGuards(JwtAuthGuard)
-  @ApiExtraModels(Event)
-  @CustomApiResponse([Event])
-  findAllByUserId(@Param('userid') userid: string) {
-    return this.eventService.findOneByUserId(userid);
-  }
-*/
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
@@ -68,26 +57,6 @@ export class EventsController {
     return this.eventService.findOneById(id);
   }
 
-  /*
-  @Get('/:id/:title')
-  @UseGuards(JwtAuthGuard)
-  @ApiExtraModels(Event)
-  @CustomApiResponse(Event)
-  findByTitle(@Param('id') userid: string, @Param('title') title: string) {
-    return this.eventService.findOneByTitle(userid, title);
-  }
-
-  @Get('/:id/:startedat')
-  @UseGuards(JwtAuthGuard)
-  @ApiExtraModels(Event)
-  @CustomApiResponse(Event)
-  findByStartedAt(
-    @Param('id') userid: string,
-    @Param('startedat') startedat: Date,
-  ) {
-    return this.eventService.findOneByStartedAt(userid, startedat);
-  }
-*/
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
