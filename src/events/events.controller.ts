@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -64,5 +65,14 @@ export class EventsController {
   @CustomApiResponse(Event)
   update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
     return this.eventService.update(id, updateEventDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiExtraModels(Event)
+  @CustomApiResponse(Event)
+  remove(@Param('id') id: string) {
+    this.eventService.remove(id);
   }
 }
