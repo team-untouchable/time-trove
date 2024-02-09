@@ -1,11 +1,11 @@
-import { IsNotEmpty, isNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateEventDto {
+  @IsNotEmpty()
   title: string;
 
   place: string;
 
-  @IsNotEmpty()
   description: string;
 
   @IsNotEmpty()
